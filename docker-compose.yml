@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  service-a:
+    build: ./f2
+    ports:
+      - "5000:5000"
+    depends_on:
+      - service-b
+      - service-c
+
+  service-b:
+    build: ./f3
+    ports:
+      - "5001:5001"
+
+  service-c:
+    build: ./f4
+    ports:
+      - "5002:5002"
+
+# docker run --rm -d service-a -p 5000:5000 hello
+# docker run --rm -d service-a -p 5000:5000 hello
+# docker run --rm -d service-a -p 5000:5000 hello
+

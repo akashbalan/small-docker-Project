@@ -1,0 +1,13 @@
+
+# Stage 1 - Build
+FROM node:18 as build
+WORKDIR /app
+COPY . .
+RUN npm install --production
+
+# Stage 2 - Run with distroless
+FROM gcr.io/distroless/nodejs:18
+COPY --from=build /app /app
+WORKDIR /app
+CMD ["index.js"]
+

@@ -1,0 +1,34 @@
+# ----------- Builder Stage -----------
+FROM ubuntu:latest AS builder
+
+ARG T_VERSION=1.6.6
+ARG P_VERSION=1.8.0
+
+RUN apt update && apt install -y wget unzip
+
+WORKDIR /tmp/bin
+
+# Download and unzip terraform & packer
+RUN wget https://releases.hashicorp.com/terraform/${T_VERSION}/terraform_${T_VERSION}_linux_amd64.zip \
+    && wget https://releases.hashicorp.com/packer/${P_VERSION}/packer_${P_VERSION}_linux_amd64.zip \
+    && unzip terraform_${T_VERSION}_linux_amd64.zip && unzip packer_${P_VERSION}_linux_amd64.zip \
+    && chmod +x terraform packer
+
+# ----------- Final Stage -----------
+FROM ubuntu:latest
+
+LABEL name="saikiran"
+
+ENV AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXXXXXXXXXX \
+    AWS_SECRET_KEY_ID=XXXXXXXXXXXXXXXXXXXXXXXX \
+    AWS_DEFAULT_REGION=us-east-1
+
+RUN apt update && apt install -y nginx
+
+COPY --from=builder /tmp/bin/terraform /usr/local/bin/terraform
+COPY --from=builder /tmp/bin/packer /usr/local/bin/packer
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+
